@@ -1,0 +1,17 @@
+client:
+  server_url: "http://localhost:8443"
+  beacon_interval: 30
+  max_retries: 5
+  retry_delay: 10
+  
+identification:
+  client_id: null  # Auto-generated if null
+  hostname: null   # Auto-detected if null
+  
+logging:
+  level: "INFO"
+  file: "logs/client.log"
+  
+security:
+  api_key: "redsignal-demo-key-2024"
+  verify_ssl: false
