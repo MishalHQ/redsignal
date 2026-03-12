@@ -47,3 +47,9 @@ Thumbs.db
 *.pem
 client_data/
 server_data/
+venv/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+logs/

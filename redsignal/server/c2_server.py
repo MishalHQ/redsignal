@@ -33,7 +33,6 @@ from .web_interface import create_web_interface
 
 logger = get_logger(__name__)
 
-
 class RedSignalServer:
     """Main C2 server for RedSignal platform."""
 
@@ -193,6 +192,30 @@ class RedSignalServer:
                 logger.error(f"Command error: {e}")
                 raise HTTPException(status_code=500, detail=str(e))
 
+        @self.app.get("/api/command/{command_id}")
+        async def get_command_details(command_id: str):
+            """Get details of a specific command."""
+            try:
+                command = self.command_handler.get_command_by_id(command_id)
+                
+                if command:
+                    return {
+                        "success": True,
+                        "data": command
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": "Command not found"
+                    }
+                    
+            except Exception as e:
+                logger.error(f"Error getting command details: {e}")
+                return {
+                    "success": False,
+                    "error": str(e)
+                }
+
         @self.app.get("/api/clients")
         async def list_clients():
             """List all registered clients."""
@@ -262,18 +285,14 @@ class RedSignalServer:
         server = uvicorn.Server(config)
         await server.serve()
 
-
 def create_server(config_path: str = "config/server_config.yaml") -> RedSignalServer:
     """Factory function to create server instance."""
     return RedSignalServer(config_path)
-
 
 async def main():
     """Main entry point for the server."""
     server = create_server()
     await server.start()
 
-
 if __name__ == "__main__":
     asyncio.run(main())
-

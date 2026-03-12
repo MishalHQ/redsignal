@@ -69,12 +69,15 @@ class BeaconMessage(BaseMessage):
 
     def __init__(
         self,
-        client_id: str,
-        hostname: str,
-        os_info: str,
-        ip_address: str,
-        process_id: int,
-        uptime: float,
+    client_id: str,
+    hostname: str,
+    os_info: str,
+    ip_address: str,
+    process_id: int,
+    uptime: float,
+    message_id: str = None,
+    message_type=None,
+    timestamp: float = None,
     ):
         super().__init__(
             message_id=str(uuid.uuid4()),

@@ -15,7 +15,6 @@ from ..common.logger import get_logger
 
 logger = get_logger(__name__)
 
-
 class CommandStatus(Enum):
     """Status of a command in the system."""
 
@@ -24,7 +23,6 @@ class CommandStatus(Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     TIMEOUT = "timeout"
-
 
 @dataclass
 class CommandRecord:
@@ -42,7 +40,6 @@ class CommandRecord:
     response_data: Optional[Any] = None
     error_message: Optional[str] = None
     execution_time: Optional[float] = None
-
 
 class CommandHandler:
     """Handles command queuing, dispatch, and response tracking."""
@@ -135,11 +132,24 @@ class CommandHandler:
         except Exception as e:
             logger.error(f"Failed to store response: {e}")
 
+    def get_command_by_id(self, command_id: str) -> Optional[Dict[str, Any]]:
+        """Get a specific command by ID."""
+        if command_id in self.command_history:
+            record = self.command_history[command_id]
+            cmd_dict = asdict(record)
+            # Convert enum to string
+            cmd_dict['status'] = record.status.value
+            return cmd_dict
+        return None
+
     def get_command_status(self, command_id: str) -> Optional[Dict[str, Any]]:
         """Get status of a specific command."""
         if command_id in self.command_history:
             record = self.command_history[command_id]
-            return asdict(record)
+            cmd_dict = asdict(record)
+            # Convert enum to string
+            cmd_dict['status'] = record.status.value
+            return cmd_dict
         return None
 
     def get_recent_commands(self, limit: int = 50) -> List[Dict[str, Any]]:
@@ -147,11 +157,23 @@ class CommandHandler:
         commands = list(self.command_history.values())
         commands.sort(key=lambda x: x.created_time, reverse=True)
 
-        return [asdict(cmd) for cmd in commands[:limit]]
+        result = []
+        for cmd in commands[:limit]:
+            cmd_dict = asdict(cmd)
+            # Convert enum to string
+            cmd_dict['status'] = cmd.status.value
+            result.append(cmd_dict)
+        return result
 
     def get_all_commands(self) -> List[Dict[str, Any]]:
         """Get all commands in history."""
-        return [asdict(cmd) for cmd in self.command_history.values()]
+        result = []
+        for cmd in self.command_history.values():
+            cmd_dict = asdict(cmd)
+            # Convert enum to string
+            cmd_dict['status'] = cmd.status.value
+            result.append(cmd_dict)
+        return result
 
     def get_client_commands(self, client_id: str) -> List[Dict[str, Any]]:
         """Get all commands for a specific client."""
@@ -160,7 +182,13 @@ class CommandHandler:
         ]
         client_commands.sort(key=lambda x: x.created_time, reverse=True)
 
-        return [asdict(cmd) for cmd in client_commands]
+        result = []
+        for cmd in client_commands:
+            cmd_dict = asdict(cmd)
+            # Convert enum to string
+            cmd_dict['status'] = cmd.status.value
+            result.append(cmd_dict)
+        return result
 
     def cleanup_old_commands(self):
         """Remove old commands to prevent memory bloat."""
@@ -213,4 +241,3 @@ class CommandHandler:
                 for client_id, queue in self.command_queue.items()
             },
         }
-
